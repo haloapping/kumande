@@ -16,7 +16,7 @@ steps = [
             province VARCHAR(255) DEFAULT NULL,
             postal_code VARCHAR(255) DEFAULT NULL,
             details VARCHAR(255) DEFAULT NULL,
-            created_at TIMESTAMPTZ NOT NULL,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
             updated_at TIMESTAMPTZ DEFAULT NULL
         );
         """
@@ -29,7 +29,7 @@ steps = [
             username VARCHAR(255) NOT NULL UNIQUE,
             email VARCHAR(255) NOT NULL UNIQUE,
             password VARCHAR(255) NOT NULL,
-            created_at TIMESTAMPTZ NOT NULL,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
             updated_at TIMESTAMPTZ DEFAULT NULL
         );
         """
@@ -40,7 +40,7 @@ steps = [
             id VARCHAR(26) UNIQUE NOT NULL PRIMARY KEY,
             image VARCHAR(255) DEFAULT NULL,
             name VARCHAR(255) NOT NULL,
-            created_at TIMESTAMPTZ NOT NULL,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
             updated_at TIMESTAMPTZ DEFAULT NULL
         );
         """
@@ -50,7 +50,7 @@ steps = [
         CREATE TABLE owner_images (
             id VARCHAR(26) UNIQUE NOT NULL PRIMARY KEY,
             owner_id VARCHAR(26) NOT NULL REFERENCES owners(id),
-            created_at TIMESTAMPTZ NOT NULL,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
             updated_at TIMESTAMPTZ DEFAULT NULL
         );
         """
@@ -67,7 +67,7 @@ steps = [
             description VARCHAR(255) NOT NULL,
             price VARCHAR(255) NOT NULL,
             review VARCHAR(255) NOT NULL,
-            created_at TIMESTAMPTZ NOT NULL,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
             updated_at TIMESTAMPTZ DEFAULT NULL
         );
         """
@@ -78,7 +78,7 @@ steps = [
             id VARCHAR(26) UNIQUE NOT NULL PRIMARY KEY,
             food_id VARCHAR(26) NOT NULL REFERENCES foods(id),
             images VARCHAR(26) DEFAULT NULL,
-            created_at TIMESTAMPTZ NOT NULL,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
             updated_at TIMESTAMPTZ DEFAULT NULL
         );
         """
