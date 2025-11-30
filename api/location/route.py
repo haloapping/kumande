@@ -1,10 +1,9 @@
-from uuid import uuid4
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import ORJSONResponse
 from loguru import logger
 from psycopg.rows import dict_row
+from ulid import ULID
 
 from api.auth_middleware import verify_token
 from api.location.schema import (
@@ -39,9 +38,7 @@ def get_all_locations():
         raise HTTPException(status_code=status.HTTP_200_OK, detail=str(e))
 
 
-@location_router.get(
-    "/{id}", response_model=Location | None
-)
+@location_router.get("/{id}", response_model=Location | None)
 def get_by_id(id: str):
     try:
         with (
@@ -59,9 +56,7 @@ def get_by_id(id: str):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@location_router.post(
-    "/", response_model=AddLocationResp
-)
+@location_router.post("/", response_model=AddLocationResp)
 def add_new_location(req: AddLocationReq):
     try:
         with (
@@ -75,7 +70,7 @@ def add_new_location(req: AddLocationReq):
                 RETURNING *
             """
             params = [
-                str(uuid4()),
+                str(ULID()),
                 req.district,
                 req.city,
                 req.province,
@@ -101,9 +96,7 @@ def add_new_location(req: AddLocationReq):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@location_router.patch(
-    "/{id}", response_model=UpdateLocationResp
-)
+@location_router.patch("/{id}", response_model=UpdateLocationResp)
 def update_by_id(id: str, req: UpdateLocationReq):
     try:
         with (
@@ -152,9 +145,7 @@ def update_by_id(id: str, req: UpdateLocationReq):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@location_router.delete(
-    "/{id}", response_model=Location | None
-)
+@location_router.delete("/{id}", response_model=Location | None)
 def delete_by_id(id: str):
     try:
         with (

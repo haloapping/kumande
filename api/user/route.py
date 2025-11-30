@@ -1,7 +1,6 @@
 import os
 from datetime import datetime, timedelta, timezone
 from typing import Final
-from uuid import uuid4
 
 import bcrypt
 import jwt
@@ -9,6 +8,7 @@ from dotenv import load_dotenv
 from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import ORJSONResponse
 from psycopg.rows import dict_row
+from ulid import ULID
 
 from api.user.schema import LoginReq, LoginResp, RegisterReq, RegisterResp
 from db import pool
@@ -34,15 +34,14 @@ def register(req: RegisterReq):
         ):
             query = """
                 INSERT INTO users
-                VALUES(%s, %s, %s, %s, %s, %s)
+                VALUES(%s, %s, %s, %s, %s)
                 RETURNING username, email
             """
             params = [
-                str(uuid4()),
+                str(ULID()),
                 req.profile_picture,
                 req.username,
                 req.email,
-                req.fullname,
                 bcrypt.hashpw(req.password.encode(), bcrypt.gensalt()).decode(),
             ]
             user = cur.execute(query, params, prepare=True).fetchone()

@@ -6,10 +6,10 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from scalar_fastapi import get_scalar_api_reference
 
+from api.food.route import food_router
 from api.location.route import location_router
 from api.owner.route import owner_router
 from api.user.route import user_router
-from api.food.route import food_router
 from db import pool
 
 app = FastAPI(summary="Kumande App", description="Kumande App")

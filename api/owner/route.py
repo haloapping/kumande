@@ -1,9 +1,8 @@
-from uuid import uuid4
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import ORJSONResponse
 from psycopg.rows import dict_row
+from ulid import ULID
 
 from api.auth_middleware import verify_token
 from api.owner.schema import AddOwnerReq, AddOwnerResp, AllOwnersResp
@@ -32,7 +31,7 @@ def add_new_owner(req: AddOwnerReq):
                 VALUES(%s, %s, %s)
                 RETURNING id, image, name;
             """
-            params = [str(uuid4()), req.image, req.name]
+            params = [str(ULID()), req.image, req.name]
             owner = cur.execute(query, params, prepare=True).fetchone()
 
         return ORJSONResponse(

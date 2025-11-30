@@ -1,9 +1,8 @@
-from uuid import uuid4
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import ORJSONResponse
 from psycopg.rows import dict_row
+from ulid import ULID
 
 from api.auth_middleware import verify_token
 from api.food.schema import (
@@ -82,7 +81,7 @@ def add_new_food(id: str, req: AddFoodReq, payload=Depends(verify_token)):
                 RETURNING id, image, name, description, price, review;
             """
             params = [
-                str(uuid4()),
+                str(ULID()),
                 payload["id"],
                 req.owner_id,
                 req.location_id,
