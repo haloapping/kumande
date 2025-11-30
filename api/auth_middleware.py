@@ -1,13 +1,14 @@
 import os
+from typing import Final
 
 import jwt
 from dotenv import load_dotenv
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 load_dotenv()
-JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
-JWT_ALGORITHM = os.getenv("JWT_ALGORITHM")
+JWT_SECRET_KEY: Final = os.getenv("JWT_SECRET_KEY")
+JWT_ALGORITHM: Final = os.getenv("JWT_ALGORITHM")
 
 security = HTTPBearer()
 
@@ -19,4 +20,6 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
 
         return payload
     except Exception:
-        raise HTTPException(status_code=401, detail="Invalid or expired token")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token"
+        )

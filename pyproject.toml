@@ -7,8 +7,13 @@ requires-python = ">=3.10"
 dependencies = [
     "bcrypt>=5.0.0",
     "fastapi[standard]>=0.122.0",
+    "loguru>=0.7.3",
+    "orjson>=3.11.4",
     "psycopg[binary,pool]>=3.2.13",
     "pyjwt>=2.10.1",
+    "python-dotenv[cli]>=1.2.1",
+    "python-ulid>=3.1.0",
     "ruff>=0.14.6",
     "scalar-fastapi>=1.4.4",
+    "yoyo-migrations>=9.0.0",
 ]

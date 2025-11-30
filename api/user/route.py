@@ -1,19 +1,30 @@
+import os
 from datetime import datetime, timedelta, timezone
+from typing import Final
 from uuid import uuid4
 
 import bcrypt
 import jwt
+from dotenv import load_dotenv
 from fastapi import APIRouter, HTTPException, status
-from fastapi.responses import JSONResponse
+from fastapi.responses import ORJSONResponse
 from psycopg.rows import dict_row
 
 from api.user.schema import LoginReq, LoginResp, RegisterReq, RegisterResp
 from db import pool
 
+load_dotenv()
+JWT_SECRET_KEY: Final = os.getenv("JWT_SECRET_KEY")
+JWT_ALGORITHM: Final = os.getenv("JWT_ALGORITHM")
+
 user_router = APIRouter(prefix="/users", tags=["users"])
 
 
-@user_router.post("/register", response_model=RegisterResp)
+@user_router.post(
+    "/register",
+    response_class=ORJSONResponse,
+    response_model=RegisterResp,
+)
 def register(req: RegisterReq):
     try:
         with (
@@ -36,12 +47,25 @@ def register(req: RegisterReq):
             ]
             user = cur.execute(query, params, prepare=True).fetchone()
 
-        return {"message": "user is registered", "data": user}
+        return ORJSONResponse(
+            content={
+                "message": "user is registered",
+                "data": user,
+            },
+            status_code=status.HTTP_200_OK,
+        )
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
 
 
-@user_router.post("/login", response_model=LoginResp | None)
+@user_router.post(
+    "/login",
+    response_class=ORJSONResponse,
+    response_model=LoginResp | None,
+)
 def login(req: LoginReq):
     try:
         with (
@@ -54,7 +78,10 @@ def login(req: LoginReq):
             user = cur.execute(query, [req.username], prepare=True).fetchone()
 
             if user is None:
-                return JSONResponse(content={"token": None})
+                return ORJSONResponse(
+                    content={"token": None},
+                    status_code=status.HTTP_200_OK,
+                )
 
             is_password_match = bcrypt.checkpw(
                 req.password.encode(), str(user["password"]).encode()
@@ -66,9 +93,15 @@ def login(req: LoginReq):
                         "iat": datetime.now(timezone.utc),
                         "exp": datetime.now(timezone.utc) + timedelta(hours=1),
                     },
-                    key="secret",
-                    algorithm="HS256",
+                    key=JWT_SECRET_KEY,
+                    algorithm=JWT_ALGORITHM,
                 )
-                return JSONResponse(content={"token": token_jwt})
+                return ORJSONResponse(
+                    content={"token": token_jwt},
+                    status_code=status.HTTP_200_OK,
+                )
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )

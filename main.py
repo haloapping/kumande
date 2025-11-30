@@ -1,31 +1,33 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from scalar_fastapi import get_scalar_api_reference
 
+from api.location.route import location_router
+from api.owner.route import owner_router
 from api.user.route import user_router
+from api.food.route import food_router
 from db import pool
 
 app = FastAPI(summary="Kumande App", description="Kumande App")
-app.include_router(user_router)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    pool.open()
+    await pool.open()
 
     yield
 
-    pool.close()
+    await pool.close()
 
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     return JSONResponse(
-        status_code=422,
+        status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         content=jsonable_encoder({"error": exc.errors(), "body": exc.body}),
     )
 
@@ -37,3 +39,9 @@ async def scalar_html():
         openapi_url=app.openapi_url,
         scalar_proxy_url="https://proxy.scalar.com",
     )
+
+
+app.include_router(user_router)
+app.include_router(location_router)
+app.include_router(owner_router)
+app.include_router(food_router)
